@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APP_LED — BMS UDS 诊断仪表工程手册 v2.0</title>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#c9d1d9; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --red:#f85149; --yellow:#d2991d; --purple:#a371f7; --code-bg:#1c2128 }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:24px}
+  .container{max-width:1100px;margin:0 auto}
+  h1{font-size:2rem;border-bottom:2px solid var(--border);padding-bottom:12px;margin-bottom:8px;color:var(--purple)}
+  h2{font-size:1.4rem;color:var(--accent);margin:40px 0 16px;border-bottom:1px solid var(--border);padding-bottom:6px}
+  h3{font-size:1.1rem;color:var(--purple);margin:28px 0 10px}
+  .subtitle{color:var(--muted);font-size:.95rem;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.9rem}
+  th,td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+  th{background:var(--code-bg);color:var(--accent);font-weight:600}
+  td{background:var(--card)}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:14px 18px;overflow-x:auto;font-family:'JetBrains Mono','Consolas',monospace;font-size:.85rem;line-height:1.55;margin:10px 0}
+  .tag{display:inline-block;border-radius:4px;padding:2px 8px;font-size:.78rem;font-weight:600}
+  .tg{background:#1a3a1a;color:var(--green)} .tr{background:#3a1a1a;color:var(--red)} .ty{background:#3a2e0f;color:var(--yellow)} .tb{background:#0f2e3a;color:var(--accent)} .tp{background:#1a0f3a;color:var(--purple)}
+  .ui{display:grid;grid-template-columns:1fr 2fr;gap:8px;font-family:monospace;font-size:.78rem;margin:10px 0}
+  .ui div{background:var(--code-bg);border:1px solid var(--border);padding:4px 8px;border-radius:4px}
+  .ui .hdr{grid-column:1/-1;background:var(--card);color:var(--accent);text-align:center}
+  hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+  .toc{list-style:none;padding-left:0} .toc a{color:var(--accent);text-decoration:none} .toc .l2{padding-left:20px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🔋 APP_LED — BMS UDS 诊断仪表工程手册 v2.0</h1>
+<p class="subtitle">
+  MCU：STM32F407ZGTx | LCD：800×480 横屏 | GUI：LVGL v8.1.1<br>
+  CAN：500kbps | APP起始：0x08010000 | 串口：USART1 115200<br>
+  状态：<span class="tag tg">UDS 全服务 + BMS 仪表盘完成</span>
+</p>
+
+<h2>📑 目录</h2>
+<ul class="toc">
+  <li><a href="#s1">1. 架构总览</a></li>
+  <li class="l2"><a href="#s1-1">主循环四任务</a></li>
+  <li><a href="#s2">2. BMS 数据模型</a></li>
+  <li><a href="#s3">3. UDS 服务全景</a></li>
+  <li class="l2"><a href="#s3-1">0x10 会话控制</a></li>
+  <li class="l2"><a href="#s3-2">0x11 ECU 复位</a></li>
+  <li class="l2"><a href="#s3-3">0x14 清除诊断信息</a></li>
+  <li class="l2"><a href="#s3-4">0x19 读 DTC</a></li>
+  <li class="l2"><a href="#s3-5">0x22 读 BMS 数据</a></li>
+  <li class="l2"><a href="#s3-6">0x27 安全访问</a></li>
+  <li class="l2"><a href="#s3-7">0x28 通信控制</a></li>
+  <li class="l2"><a href="#s3-8">0x2E 写参数（需解锁）</a></li>
+  <li class="l2"><a href="#s3-9">0x31 例行程序</a></li>
+  <li class="l2"><a href="#s3-10">0x85 控制 DTC 设置</a></li>
+  <li><a href="#s4">4. 完整交互示例</a></li>
+  <li><a href="#s5">5. LVGL UI 设计</a></li>
+  <li><a href="#s6">6. NRC 否定响应码</a></li>
+</ul>
+
+<hr>
+
+<h2 id="s1">1. 架构总览</h2>
+
+<h3 id="s1-1">主循环四任务</h3>
+<div class="card">
+<table>
+<tr><th>优先级</th><th>任务</th><th>频率</th></tr>
+<tr><td><span class="tag tr">最高</span></td><td>UDS/ISOTP 处理（临界区保护）</td><td>即时</td></tr>
+<tr><td><span class="tag ty">高</span></td><td>LVGL 事务</td><td>每 5ms</td></tr>
+<tr><td><span class="tag tb">中</span></td><td>BMS UI 数据刷新</td><td>每 500ms</td></tr>
+<tr><td>低</td><td>心跳 LED</td><td>每 100ms</td></tr>
+</table>
+</div>
+
+<h2 id="s2">2. BMS 数据模型</h2>
+<div class="card">
+<table>
+<tr><th>变量</th><th>默认值</th><th>说明</th><th>DID</th></tr>
+<tr><td><code>g_bms_voltage</code></td><td>12600</td><td>总电压 (mV)</td><td>0xF100</td></tr>
+<tr><td><code>g_bms_current</code></td><td>-2300</td><td>电流 (mA, 有符号)</td><td>0xF101</td></tr>
+<tr><td><code>g_bms_soc</code></td><td>78</td><td>SOC (%)</td><td>0xF102</td></tr>
+<tr><td><code>g_bms_soh</code></td><td>95</td><td>SOH (%)</td><td>0xF103</td></tr>
+<tr><td><code>g_bms_cell_max/min</code></td><td>3650/3580</td><td>单体电压 (mV)</td><td>0xF104/05</td></tr>
+<tr><td><code>g_bms_temp_max/min</code></td><td>35/28</td><td>温度 (°C)</td><td>0xF106/07</td></tr>
+<tr><td><code>g_bms_status</code></td><td>2</td><td>0=空闲 1=充电 2=放电</td><td>0xF108</td></tr>
+<tr><td><code>g_bms_cell_count</code></td><td>4</td><td>电芯数</td><td>0xF109</td></tr>
+<tr><td><code>g_can_rx_count</code></td><td>0</td><td>CAN 帧计数</td><td>0xF110</td></tr>
+<tr><td><code>g_dtc_count</code></td><td>4</td><td>DTC 数量</td><td>0xF111</td></tr>
+<tr><td><code>g_charge_enable</code></td><td>1</td><td>充电开关</td><td>0xF180</td></tr>
+<tr><td><code>g_balance_enable</code></td><td>0</td><td>均衡开关</td><td>0xF181</td></tr>
+<tr><td><code>g_bms_vin</code></td><td>FCX2026BMS7890123</td><td>车架号</td><td>0xF190</td></tr>
+<tr><td><code>g_bms_sw_version</code></td><td>V2.1.0_RC2</td><td>软件版本</td><td>0xF189</td></tr>
+</table>
+</div>
+
+<h2 id="s3">3. UDS 服务全景</h2>
+
+<h3 id="s3-1">0x10 会话控制</h3>
+<div class="card">
+<table><tr><th>子功能</th><th>行为</th></tr>
+<tr><td>0x01</td><td>默认会话，重置安全锁</td></tr>
+<tr><td>0x02</td><td>编程会话 → 写暗号 + 软复位 → Bootloader</td></tr>
+<tr><td>0x03</td><td>扩展诊断会话，重置安全锁</td></tr></table>
+<pre>10 01 → 50 01 00 32 27 10
+10 02 → 50 02 00 32 → NVIC_SystemReset
+10 03 → 50 03 00 32 27 10</pre>
+</div>
+
+<h3 id="s3-2">0x11 ECU 复位</h3>
+<div class="card"><pre>11 01 → 51 01 → hardReset  11 03 → 51 03 → softReset</pre></div>
+
+<h3 id="s3-3">0x14 清除诊断信息</h3>
+<div class="card"><pre>14 FF FF FF → 54 <span class="muted">// 清全部</span>
+14 00 F1 00 → 54 <span class="muted">// 清 0xF100</span></pre></div>
+
+<h3 id="s3-4">0x19 读 DTC</h3>
+<div class="card">
+<p>受 <code>g_dtc_enabled</code> 控制，关闭后回 7F 19 22。</p>
+<pre>19 01 FF → 59 01 00 00 + count  <span class="muted">// 数量</span>
+19 02 FF → 59 02 00 00 + DTC[3]+status <span class="muted">// 列表</span>
+19 06    → 59 06 + 全部DTC      <span class="muted">// 全部</span></pre>
+</div>
+
+<h3 id="s3-5">0x22 读 BMS 数据</h3>
+<div class="card">
+<table>
+<tr><th>DID</th><th>内容</th><th>DID</th><th>内容</th></tr>
+<tr><td>0xF190</td><td>VIN 车架号</td><td>0xF100</td><td>总电压</td></tr>
+<tr><td>0xF189</td><td>软件版本</td><td>0xF101</td><td>电流</td></tr>
+<tr><td>0xF102</td><td>SOC</td><td>0xF103</td><td>SOH</td></tr>
+<tr><td>0xF104/05</td><td>单体电压max/min</td><td>0xF106/07</td><td>温度max/min</td></tr>
+<tr><td>0xF108</td><td>充放电状态</td><td>0xF109</td><td>电芯数量</td></tr>
+<tr><td>0xF110</td><td>CAN 帧计数</td><td>0xF111</td><td>DTC 数量</td></tr>
+<tr><td>0xF180</td><td>充电开关</td><td>0xF181</td><td>均衡开关</td></tr>
+</table>
+<pre>22 F1 02 → 62 F1 02 4E  <span class="muted">// SOC=78%</span>
+22 F1 10 → 62 F1 10 xx xx xx xx <span class="muted">// CAN 计数</span></pre>
+</div>
+
+<h3 id="s3-6">0x27 安全访问</h3>
+<div class="card">
+<p><span class="tag tr">写参数 (0x2E) 和 例行程序 (0x31) 需要先解锁</span></p>
+<pre>27 01 → 67 01 + seed[4大端]
+<span class="muted">// key = ((~seed)^0x5A5A5A5A)+0x3618BC91</span>
+27 02 + key[4大端] → 67 02  <span class="muted">// 解锁</span>
+<span class="muted">// 3次失败 → 锁10秒</span></pre>
+</div>
+
+<h3 id="s3-7">0x28 通信控制</h3>
+<div class="card"><pre>28 00 00 → 68 00 00 <span class="muted">// 正常</span>
+28 01 03 → 68 01 03 <span class="muted">// 静默 (停发NM)</span></pre></div>
+
+<h3 id="s3-8">0x2E 写参数（需解锁）</h3>
+<div class="card">
+<p><span class="tag tr">先发 27 01 + 27 02 解锁，再发 2E</span></p>
+<table>
+<tr><th>DID</th><th>请求</th><th>效果</th></tr>
+<tr><td>0xF102</td><td><code>2E F1 02 50</code></td><td>SOC = 50%</td></tr>
+<tr><td>0xF108</td><td><code>2E F1 08 01</code></td><td>状态 = 充电</td></tr>
+<tr><td>0xF101</td><td><code>2E F1 01 05 DC</code></td><td>电流 = 1500mA</td></tr>
+<tr><td>0xF180</td><td><code>2E F1 80 00</code></td><td>禁用充电</td></tr>
+<tr><td>0xF181</td><td><code>2E F1 81 01</code></td><td>开启均衡</td></tr>
+</table>
+<pre><span class="muted">// 未解锁就写 →</span>
+7F 2E 33  <span class="muted">// NRC 33: 安全拒绝</span></pre>
+</div>
+
+<h3 id="s3-9">0x31 例行程序（需解锁）</h3>
+<div class="card">
+<table>
+<tr><th>RID</th><th>请求</th><th>效果</th></tr>
+<tr><td>0xE001</td><td><code>31 01 E0 01</code></td><td>BMS 自检</td></tr>
+<tr><td>0xE002</td><td><code>31 01 E0 02</code></td><td>SOC = 100%</td></tr>
+<tr><td>0xE003</td><td><code>31 01 E0 03</code></td><td>SOH = 100%</td></tr>
+</table></div>
+
+<h3 id="s3-10">0x85 控制 DTC 设置</h3>
+<div class="card"><pre>85 01 → C5 01 <span class="muted">// 开启 DTC</span>
+85 02 → C5 02 <span class="muted">// 关闭 DTC</span></pre></div>
+
+<h2 id="s4">4. 完整交互示例</h2>
+<div class="card">
+<h3>场景 A：修改参数</h3>
+<pre><span class="muted"># 1. 解锁</span>
+27 01 → 67 01 + seed
+27 02 + key → 67 02
+
+<span class="muted"># 2. 修改 SOC</span>
+2E F1 02 50 → 6E F1 02
+
+<span class="muted"># 3. 屏幕 500ms 内刷新到 50%</span></pre>
+
+<h3>场景 B：查故障码 + 复位 SOC</h3>
+<pre>19 01 FF → 59 01 00 00 04         <span class="muted">// 4条DTC</span>
+19 02 FF → 59 02 00 00 + DTC列表
+14 FF FF FF → 54                   <span class="muted">// 全清</span>
+
+27 01 → 67 01 + seed
+27 02 + key → 67 02
+31 01 E0 02 → 71 E0 02 01          <span class="muted">// SOC=100%</span></pre>
+</div>
+
+<h2 id="s5">5. LVGL UI 设计</h2>
+<div class="card">
+<div class="ui">
+  <div class="hdr">┌──────────────────────────────────────────┐</div>
+  <div class="hdr">│ FCXC@TeacherOrange | BMS Diag v2.1  🟢🟢│</div>
+  <div class="hdr">├──────────────┬───────────────────────────┤</div>
+  <div style="text-align:center;padding:12px">
+    SOC<br>[Arc 180×180]<br><b>78%</b><br>SOH:95% Cells:4S
+  </div>
+  <div>
+    Battery Live Data<br>
+    Total Volt 12.60V | Current -2.3A<br>
+    Cell Max 3.65V  | Cell Min 3.58V<br>
+    Temp Max 35C    | Temp Min 28C<br>
+    Chg/Dischg Dischg
+  </div>
+  <div class="hdr">├──────────────────────────────────────────┤</div>
+  <div class="hdr">│ DTC:0xF100[ACT] 0xF101 0xF102 0xF103 CAN:0│</div>
+  <div class="hdr">└──────────────────────────────────────────┘</div>
+</div>
+<table style="margin-top:12px">
+<tr><th>配色</th><th>值</th><th>用途</th></tr>
+<tr><td>#0F172A</td><td style="background:#0F172A;color:#fff">深空黑</td><td>主背景</td></tr>
+<tr><td>#1E293B</td><td style="background:#1E293B;color:#fff">深蓝灰</td><td>面板卡片</td></tr>
+<tr><td>#F97316</td><td style="background:#F97316">活力橙</td><td>品牌标志</td></tr>
+<tr><td>#3B82F6</td><td style="background:#3B82F6">科技蓝</td><td>SOC 圆弧</td></tr>
+<tr><td>#F8FAFC</td><td style="background:#F8FAFC;color:#000">白</td><td>数据值</td></tr>
+<tr><td>#94A3B8</td><td style="background:#94A3B8">灰</td><td>标签</td></tr>
+</table>
+</div>
+
+<h2 id="s6">6. NRC 否定响应码</h2>
+<div class="card">
+<table>
+<tr><th>NRC</th><th>含义</th><th>可能原因</th></tr>
+<tr><td><code>0x10</code></td><td>通用拒绝</td><td>未分类错误</td></tr>
+<tr><td><code>0x11</code></td><td>服务不支持</td><td>APP 不支持刷写服务</td></tr>
+<tr><td><code>0x12</code></td><td>子功能不支持</td><td>未知子功能</td></tr>
+<tr><td><code>0x13</code></td><td>长度错误</td><td>报文太短</td></tr>
+<tr><td><code>0x22</code></td><td>条件不满足</td><td>DTC关闭/非编程会话/刷写去Bootloader</td></tr>
+<tr><td><code>0x33</code></td><td>安全拒绝</td><td>2E/31 未解锁</td></tr>
+<tr><td><code>0x35</code></td><td>密钥无效</td><td>27 02 密钥算错</td></tr>
+<tr><td><code>0x36</code></td><td>重试超限</td><td>3次失败</td></tr>
+<tr><td><code>0x37</code></td><td>锁定延迟中</td><td>等10秒</td></tr>
+</table>
+</div>
+
+<hr>
+<div style="text-align:center;color:var(--muted);margin:40px 0 20px;font-size:.85rem">APP_LED — BMS UDS 诊断仪表 v2.0 | 2026-06-11</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+app_led\qrcodegen.o: ..\lvgl\src\extra\libs\qrcode\qrcodegen.c
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\assert.h
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\limits.h
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdlib.h
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\qrcodegen.o: ..\lvgl\src\extra\libs\qrcode\qrcodegen.h
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdbool.h
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\qrcodegen.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
