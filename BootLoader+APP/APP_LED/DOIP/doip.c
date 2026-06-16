@@ -26,6 +26,9 @@ static struct tcp_pcb *g_doip_listen_pcb = NULL;
 static struct tcp_pcb *g_doip_client_pcb = NULL;
 static struct udp_pcb *g_doip_udp_pcb    = NULL;
 
+/* 存储最近一次诊断请求的客户端源地址 (用于响应时正确填写TA) */
+static uint16_t g_doip_client_sa = 0x0E00;
+
 /* 接收缓冲: 最大 DOIP 消息 64KB, 实际用 8KB */
 #define DOIP_RX_BUF_SIZE    8192
 static uint8_t  doip_rx_buf[DOIP_RX_BUF_SIZE];
@@ -131,16 +134,23 @@ static void doip_routing_activation(uint8_t *payload, uint32_t len)
     uint8_t resp[9];
     uint16_t client_la;
 
-    if (len < 7) {
-        client_la = 0;
-    } else {
-        client_la = be16(&payload[0]);
+    if (len < 2) {
+        /* 最小路由激活请求: 仅SA(2字节) */
+        printf("[DOIP] Routing activation: payload too short (%lu)\r\n", len);
+        resp[0] = g_doip_logical_addr[0];
+        resp[1] = g_doip_logical_addr[1];
+        resp[2] = 0x00; resp[3] = 0x00;
+        resp[4] = DOIP_ROUTING_WRONG_TYPE;
+        resp[5] = 0x00; resp[6] = 0x00; resp[7] = 0x00; resp[8] = 0x00;
+        doip_tcp_send(DOIP_ROUTING_RSP, resp, 9);
+        return;
     }
+    client_la = be16(&payload[0]);
 
-    /* 检查激活类型 (默认 0x00) */
-    uint8_t act_type = (len >= 8) ? payload[7] : 0x00;
+    /* Activation Type 在 payload[2-5] (4字节), ISO 13400-2 Table 12 */
+    uint32_t act_type = (len >= 6) ? be32(&payload[2]) : 0x00000000;
 
-    printf("[DOIP] Routing activation: src=0x%04X type=%d\r\n", client_la, act_type);
+    printf("[DOIP] Routing activation: src=0x%04X type=0x%08lX\r\n", client_la, act_type);
 
     /* 响应 */
     resp[0] = g_doip_logical_addr[0];
@@ -171,7 +181,8 @@ static void doip_diagnostic_handler(uint8_t *payload, uint32_t len)
         return;
     }
 
-    if (len < 2) {
+    /* 诊断消息最小长度: SA(2) + TA(2) = 4字节 (UDS可为0) */
+    if (len < 4) {
         uint8_t nack = DOIP_DIAG_NACK_INVALID_LEN;
         doip_tcp_send(DOIP_DIAG_NACK, &nack, 1);
         return;
@@ -181,7 +192,10 @@ static void doip_diagnostic_handler(uint8_t *payload, uint32_t len)
     uint16_t sa = be16(&payload[0]);
     uint16_t ta = be16(&payload[2]);
     uint8_t  *uds_data = &payload[4];
-    uint16_t uds_len   = (uint16_t)(len - 4);
+    uint16_t uds_len   = (uint16_t)(len - 4);  /* 现在保证 len >= 4，不会溢出 */
+
+    /* 存储客户端SA，响应时TA应等于请求SA (源地址互换) */
+    g_doip_client_sa = sa;
 
     printf("[DOIP] Diag: SA=0x%04X TA=0x%04X len=%u\r\n", sa, ta, uds_len);
 
@@ -226,6 +240,11 @@ static void doip_dispatch(uint8_t *payload, uint32_t payload_len, uint16_t paylo
 
     default:
         printf("[DOIP] Unknown payload type: 0x%04X\r\n", payload_type);
+        /* ISO 13400-2: 不支持的消息类型回复通用NACK */
+        {
+            uint8_t nack_code = 0x03;  /* message type not supported */
+            doip_tcp_send(DOIP_GEN_NACK, &nack_code, 1);
+        }
         break;
     }
 }
@@ -237,12 +256,11 @@ static err_t doip_recv_callback(void *arg, struct tcp_pcb *pcb,
                                  struct pbuf *p, err_t err)
 {
     if (p == NULL) {
-        /* 对端关闭连接 */
+        /* 对端正常关闭连接 */
         printf("[DOIP] Client disconnected\r\n");
+        g_doip_client_pcb = NULL;       /* 先清指针，再关PCB */
         g_doip_routing_active = 0;
-        g_doip_client_pcb = NULL;
         tcp_close(pcb);
-        tcp_arg(pcb, NULL);
         return ERR_OK;
     }
 
@@ -299,6 +317,17 @@ static err_t doip_recv_callback(void *arg, struct tcp_pcb *pcb,
 }
 
 /* ================================================================
+   TCP 错误回调 — 连接异常断开时清理状态
+   ================================================================ */
+static void doip_error_callback(void *arg, err_t err)
+{
+    printf("[DOIP] TCP error=%d, cleanup\r\n", err);
+    /* 关键: 清除全局状态，否则会永久死锁 */
+    g_doip_client_pcb = NULL;
+    g_doip_routing_active = 0;
+}
+
+/* ================================================================
    TCP Accept 回调
    ================================================================ */
 static err_t doip_accept_callback(void *arg, struct tcp_pcb *new_pcb, err_t err)
@@ -317,8 +346,8 @@ static err_t doip_accept_callback(void *arg, struct tcp_pcb *new_pcb, err_t err)
 
     tcp_arg(new_pcb, NULL);
     tcp_recv(new_pcb, doip_recv_callback);
-    tcp_err(new_pcb, NULL);
-    tcp_poll(new_pcb, NULL, 0);
+    tcp_err(new_pcb, doip_error_callback);   /* ← 注册错误回调，防死锁 */
+    tcp_poll(new_pcb, NULL, 4);              /* ← 每8秒保活检测半开连接 */
 
     printf("[DOIP] Client connected: %d.%d.%d.%d\r\n",
            ip4_addr1(&new_pcb->remote_ip), ip4_addr2(&new_pcb->remote_ip),
@@ -334,16 +363,27 @@ void DOIP_Announce_UDP(void)
 {
     if (g_doip_udp_pcb == NULL) return;
 
-    struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT, 33, PBUF_RAM);
+    /* DoIP 头部 (8B) + 公告 payload (32B) = 40B */
+    struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT, 40, PBUF_RAM);
     if (p == NULL) return;
 
     uint8_t *pl = (uint8_t *)p->payload;
     uint8_t *pp = pl;
+
+    /* ─── DoIP Header (8 bytes) ─── */
+    *pp++ = DOIP_PROTOCOL_VERSION;              /* version = 0x02 */
+    *pp++ = (uint8_t)(~DOIP_PROTOCOL_VERSION);  /* version_inv = ~0x02 */
+    set_be16(pp, DOIP_VEHICLE_ANNOUNCE);        /* payload_type = 0x0004 */
+    pp += 2;
+    set_be32(pp, 32);                           /* payload_len = 32 */
+    pp += 4;
+
+    /* ─── Vehicle Announce Payload (32 bytes) ─── */
     memcpy(pp, DOIP_VIN, 17); pp += 17;
     *pp++ = g_doip_logical_addr[0]; *pp++ = g_doip_logical_addr[1];
     for (int i = 5; i >= 0; i--) *pp++ = (uint8_t)(DOIP_EID >> (i * 8));
     for (int i = 5; i >= 0; i--) *pp++ = (uint8_t)(DOIP_GID >> (i * 8));
-    *pp++ = 0x00;
+    *pp++ = 0x00;  /* Further action */
 
     p->len = pp - pl;
     p->tot_len = p->len;
@@ -361,29 +401,38 @@ void DOIP_Announce_UDP(void)
    ================================================================ */
 void DOIP_Send_Diag_PosResponse(uint8_t *uds_data, uint16_t len)
 {
-    /* DOIP 诊断消息格式: SA(2) + TA(2) + UDS payload */
-    uint8_t buf[4096];
+    /* DOIP 诊断消息格式: SA(2) + TA(2) + UDS payload
+       SA = ECU逻辑地址, TA = 客户端源地址 (SA/TA互换)
+       使用 static 缓冲避免 4KB 栈分配导致栈溢出 */
+    static uint8_t buf[4096];
+
+    if (len > 4092) return;  /* 安全阀: SA+TA=4, 剩余4092给UDS */
+
     buf[0] = g_doip_logical_addr[0];
     buf[1] = g_doip_logical_addr[1];
-    buf[2] = 0x0E;  /* 默认 TA */
-    buf[3] = 0x00;
+    buf[2] = (uint8_t)(g_doip_client_sa >> 8);
+    buf[3] = (uint8_t)(g_doip_client_sa & 0xFF);
     if (len > 0 && uds_data != NULL) {
         memcpy(&buf[4], uds_data, len);
     }
-    doip_tcp_send(DOIP_DIAG_ACK, buf, len + 4);
+    /* 使用 0x8001 Diagnostic Message 承载 UDS 响应
+       (非 0x8002 ACK，后者仅含1字节确认码) */
+    doip_tcp_send(DOIP_DIAG_MSG, buf, len + 4);
 }
 
 void DOIP_Send_Diag_NegResponse(uint8_t sid, uint8_t nrc)
 {
+    /* DOIP 诊断消息格式: SA(2) + TA(2) + UDS否定响应(0x7F+SID+NRC)
+       使用 0x8001 Diagnostic Message 承载 (非 0x8003，后者是传输层NACK) */
     uint8_t buf[8];
     buf[0] = g_doip_logical_addr[0];
     buf[1] = g_doip_logical_addr[1];
-    buf[2] = 0x0E;
-    buf[3] = 0x00;
+    buf[2] = (uint8_t)(g_doip_client_sa >> 8);
+    buf[3] = (uint8_t)(g_doip_client_sa & 0xFF);
     buf[4] = 0x7F;
     buf[5] = sid;
     buf[6] = nrc;
-    doip_tcp_send(DOIP_DIAG_NACK, buf, 7);
+    doip_tcp_send(DOIP_DIAG_MSG, buf, 7);
 }
 
 /* ================================================================
@@ -422,6 +471,19 @@ void DOIP_Init(void)
    ================================================================ */
 void DOIP_Process(void)
 {
-    /* TCP raw API 回调在 ethernetif_input 中处理, 这里留空
-       如有需要可添加超时处理、自动公告等 */
+    /* UDP 车辆公告: 网络link up后每5秒广播一次 (ISO 13400-2) */
+    static uint32_t last_announce = 0;
+    static uint8_t  first_run = 1;
+    extern volatile uint8_t g_eth_link_up;
+
+    if (first_run) {
+        first_run = 0;
+        printf("[DOIP] DOIP_Process started, link=%d tick=%lu pcb=%p\r\n",
+               g_eth_link_up, HAL_GetTick(), (void*)g_doip_udp_pcb);
+    }
+
+    if (g_eth_link_up && (HAL_GetTick() - last_announce >= 5000)) {
+        DOIP_Announce_UDP();
+        last_announce = HAL_GetTick();
+    }
 }

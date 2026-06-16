@@ -1,8 +1,8 @@
 app_led\isotp.o: ..\Core\Src\isotp.c
 app_led\isotp.o: ../Core/Inc/isotp.h
-app_led\isotp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\isotp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\isotp.o: ../Core/Inc/uds.h
-app_led\isotp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\isotp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
 app_led\isotp.o: ../Core/Inc/can.h
 app_led\isotp.o: ../Core/Inc/main.h
 app_led\isotp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h

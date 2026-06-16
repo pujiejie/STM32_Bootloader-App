@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UDS 服务参考手册 — BMS v2.1</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0F172A;color:#E2E8F0;line-height:1.7;padding:20px}
+h1{color:#F97316;font-size:26px;text-align:center;margin:20px 0 8px}
+.subtitle{text-align:center;color:#64748B;font-size:13px;margin-bottom:30px}
+h2{color:#3B82F6;font-size:20px;margin:36px 0 14px;padding-bottom:6px;border-bottom:1px solid #1E293B}
+h3{color:#94A3B8;font-size:15px;margin:18px 0 8px}
+.svc{background:#1E293B;border:1px solid #334155;border-radius:10px;margin:16px 0;overflow:hidden}
+.svc-header{padding:14px 18px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #334155}
+.svc-sid{background:#F97316;color:#fff;font-size:16px;font-weight:700;padding:4px 12px;border-radius:5px;white-space:nowrap}
+.svc-name{font-size:16px;font-weight:600;flex:1}
+.svc-dir{font-size:11px;color:#64748B;white-space:nowrap}
+.svc-body{padding:16px 18px}
+code,.code{font-family:'Cascadia Code','Consolas',monospace;background:#0F172A;padding:2px 7px;border-radius:4px;font-size:13px;color:#22C55E}
+pre{background:#020617;border-radius:8px;padding:14px 16px;overflow-x:auto;margin:10px 0;font-family:'Cascadia Code','Consolas',monospace;font-size:13px;line-height:1.8;border:1px solid #1E293B}
+pre .req{color:#F97316}
+pre .res{color:#3B82F6}
+pre .val{color:#22C55E}
+pre .cmt{color:#475569}
+table{width:100%;border-collapse:collapse;margin:10px 0}
+th{background:#1E293B;color:#94A3B8;text-align:left;padding:8px 12px;font-size:12px;font-weight:600}
+td{padding:8px 12px;border-bottom:1px solid #1E293B;font-size:13px}
+td code{font-size:12px}
+.nrc-table td:first-child{color:#22C55E;font-weight:600;width:60px}
+.sf-table td:first-child{color:#F97316;font-weight:600;width:60px}
+p{margin:8px 0;font-size:14px}
+ul{margin:8px 0 8px 24px;font-size:14px}
+li{margin:4px 0}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-ok{background:rgba(34,197,94,.15);color:#22C55E}
+.badge-warn{background:rgba(249,115,22,.15);color:#F97316}
+.badge-info{background:rgba(59,130,246,.15);color:#3B82F6}
+.summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:16px 0}
+.sum-card{background:#1E293B;border-radius:8px;padding:12px 14px;text-align:center;border:1px solid #334155}
+.sum-card .sid{font-size:24px;font-weight:700;color:#F97316}
+.sum-card .name{font-size:12px;color:#94A3B8;margin-top:4px}
+.sum-card .status{font-size:11px;margin-top:2px}
+.nowrap{white-space:nowrap}
+</style>
+</head>
+<body>
+
+<h1>🔧 UDS 诊断服务参考手册</h1>
+<p class="subtitle">BMS v2.1 · ECU 逻辑地址 0x0E80 · CAN 500kbps / DoIP TCP:13400</p>
+
+<h2>总览</h2>
+
+<div class="summary">
+  <div class="sum-card"><div class="sid">10</div><div class="name">会话控制</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">11</div><div class="name">ECU 复位</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">14</div><div class="name">清除诊断信息</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">19</div><div class="name">读 DTC</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">22</div><div class="name">读数据</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">27</div><div class="name">安全访问</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">28</div><div class="name">通信控制</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">2E</div><div class="name">写数据</div><div class="status"><span class="badge badge-warn">需解锁</span></div></div>
+  <div class="sum-card"><div class="sid">31</div><div class="name">例程控制</div><div class="status"><span class="badge badge-warn">需解锁</span></div></div>
+  <div class="sum-card"><div class="sid">3E</div><div class="name">测试仪在线</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">85</div><div class="name">DTC 设置</div><div class="status"><span class="badge badge-ok">CAN+DoIP</span></div></div>
+  <div class="sum-card"><div class="sid">34/36/37</div><div class="name">刷写</div><div class="status"><span class="badge badge-info">仅Bootloader</span></div></div>
+</div>
+
+<h2>通信参数</h2>
+<table>
+  <tr><th style="width:180px">参数</th><th>CAN</th><th>DoIP</th></tr>
+  <tr><td>速率</td><td>500 kbps</td><td>100 Mbps Ethernet</td></tr>
+  <tr><td>ECU 地址</td><td>响应 ID: <code>0x7E8</code></td><td>TCP <code>172.16.1.10:13400</code></td></tr>
+  <tr><td>测试仪地址</td><td>请求 ID: <code>0x7E0</code></td><td>逻辑地址 <code>0x0E00</code></td></tr>
+  <tr><td>传输层</td><td>ISO-TP (ISO 15765-2)</td><td>DoIP (ISO 13400-2)</td></tr>
+  <tr><td>路由要求</td><td>无需</td><td>需先 <code>0x0005</code> 路由激活</td></tr>
+</table>
+
+<h2>否定响应码 (NRC) 参考</h2>
+<table class="nrc-table">
+  <tr><th>NRC</th><th>名称</th><th>触发条件</th></tr>
+  <tr><td><code>0x10</code></td><td>General Reject</td><td>通用拒绝</td></tr>
+  <tr><td><code>0x11</code></td><td>Service Not Supported</td><td>不支持该 SID（如 DoIP 发 0x34）</td></tr>
+  <tr><td><code>0x12</code></td><td>SubFunction Not Supported</td><td>子功能不支持（如 0x10 04）</td></tr>
+  <tr><td><code>0x13</code></td><td>Incorrect Message Length</td><td>报文长度不足</td></tr>
+  <tr><td><code>0x22</code></td><td>Conditions Not Correct</td><td>DTC 被禁用时读 DTC；APP 收刷写命令</td></tr>
+  <tr><td><code>0x24</code></td><td>Request Sequence Error</td><td>请求顺序错误</td></tr>
+  <tr><td><code>0x31</code></td><td>Request Out Of Range</td><td>DID/RID 不在支持列表中</td></tr>
+  <tr><td><code>0x33</code></td><td>Security Access Denied</td><td>安全未解锁就执行受保护操作</td></tr>
+  <tr><td><code>0x35</code></td><td>Invalid Key</td><td>安全访问 Key 错误</td></tr>
+  <tr><td><code>0x36</code></td><td>Exceeded Number Of Attempts</td><td>连续 3 次输错 Key，锁定 10 秒</td></tr>
+  <tr><td><code>0x37</code></td><td>Required Time Delay Not Expired</td><td>锁定期间重试</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>1. 会话控制 — SID <code>0x10</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x10</span><span class="svc-name">Diagnostic Session Control</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>切换 ECU 诊断会话模式。不同会话提供不同权限级别的服务访问。切换会话会复位安全解锁状态。</p>
+
+<h3>子功能</h3>
+<table class="sf-table">
+  <tr><th>SF</th><th>会话</th><th>说明</th></tr>
+  <tr><td><code>0x01</code></td><td>默认会话</td><td>上电默认。仅 0x22 读数据、0x19 读 DTC</td></tr>
+  <tr><td><code>0x02</code></td><td>编程会话</td><td>⚠️ <b>收到后直接跳 Bootloader</b>（复位重启）</td></tr>
+  <tr><td><code>0x03</code></td><td>扩展会话</td><td>允许 0x27 安全访问、0x2E 写数据、0x31 例程</td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 切换到扩展会话</span>
+<span class="req">请求:</span> 10 03
+<span class="res">响应:</span> 50 03 00 32 13        <span class="cmt">// SF=03 P2=50ms P2*=5000ms</span>
+
+<span class="cmt">// 切换到编程会话 → ECU 立即复位进入 Bootloader</span>
+<span class="req">请求:</span> 10 02
+<span class="res">响应:</span> 50 02 00 32 13        <span class="cmt">// 正响应发出后，ECU 在 20ms 内复位</span>
+</pre>
+
+<h3>对应代码</h3>
+<p><code>UDS_Service_10_App()</code> — 第 88 行 uds.c</p>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>2. ECU 复位 — SID <code>0x11</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x11</span><span class="svc-name">ECU Reset</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>强制 ECU 硬件复位。正响应发出后 20ms 内执行 <code>NVIC_SystemReset()</code>。</p>
+
+<h3>子功能</h3>
+<table class="sf-table">
+  <tr><th>SF</th><th>复位类型</th></tr>
+  <tr><td><code>0x01</code></td><td>硬复位 (Hard Reset)</td></tr>
+  <tr><td><code>0x03</code></td><td>软复位 (等同于硬复位)</td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="req">请求:</span> 11 01
+<span class="res">响应:</span> 51 01                 <span class="cmt">// ECU 随后复位</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>3. 清除诊断信息 — SID <code>0x14</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x14</span><span class="svc-name">Clear Diagnostic Information</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>清除指定的 DTC 故障码。</p>
+
+<h3>参数</h3>
+<table>
+  <tr><th>参数</th><th>含义</th></tr>
+  <tr><td><code>0xFFFFFF</code></td><td>清除 <b>全部</b> DTC</td></tr>
+  <tr><td>指定 DTC Code（3字节）</td><td>仅清除匹配的单个 DTC</td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 清除全部 DTC</span>
+<span class="req">请求:</span> 14 FF FF FF
+<span class="res">响应:</span> 54
+
+<span class="cmt">// 清除指定 DTC</span>
+<span class="req">请求:</span> 14 00 F1 00           <span class="cmt">// 只清除 0xF100</span>
+<span class="res">响应:</span> 54
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>4. 读 DTC — SID <code>0x19</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x19</span><span class="svc-name">Read DTC Information</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>读取故障码信息。支持按状态掩码过滤。<span class="badge badge-warn">需 DTC 功能开启</span>（0x85 服务控制）。</p>
+
+<h3>子功能</h3>
+<table class="sf-table">
+  <tr><th>SF</th><th>功能</th><th>参数</th></tr>
+  <tr><td><code>0x01</code></td><td>按状态掩码统计数量</td><td><code>[19 01 mask]</code></td></tr>
+  <tr><td><code>0x02</code></td><td>按状态掩码列出 DTC</td><td><code>[19 02 mask]</code></td></tr>
+  <tr><td><code>0x06</code></td><td>列出全部 DTC（忽略掩码）</td><td><code>[19 06]</code></td></tr>
+</table>
+
+<h3>状态掩码 (bit flags)</h3>
+<table>
+  <tr><th>位</th><th>值</th><th>名称</th><th>含义</th></tr>
+  <tr><td>bit 0</td><td><code>0x01</code></td><td>Test Failed</td><td>最近一次检测失败</td></tr>
+  <tr><td>bit 3</td><td><code>0x08</code></td><td>Confirmed DTC</td><td>故障已确认，需诊断仪清除</td></tr>
+  <tr><td>bit 5</td><td><code>0x20</code></td><td>Pending DTC</td><td>疑似故障，等待确认</td></tr>
+  <tr><td>bit 7</td><td><code>0x40</code></td><td>Warning Indicator</td><td>仪表盘故障灯点亮</td></tr>
+</table>
+<p>掩码可组合：<code>0x09</code> = Test Failed + Confirmed；<code>0xFF</code> = 全部。</p>
+
+<h3>响应格式</h3>
+<p>SF=0x01 返回：<code>59 01 00 00 [cnt]</code></p>
+<p>SF=0x02/0x06 返回：<code>59 02 00 00 [DTC_3B+Status_1B]*N</code></p>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 统计已确认的 DTC 数量</span>
+<span class="req">请求:</span> 19 01 08
+<span class="res">响应:</span> 59 01 00 00 <span class="val">03</span>        <span class="cmt">// 3 个已确认</span>
+
+<span class="cmt">// 列出全部 DTC</span>
+<span class="req">请求:</span> 19 02 FF
+<span class="res">响应:</span> 59 02 00 00
+          <span class="val">00F100 49</span>              <span class="cmt">// 已确认+警告灯+测试失败</span>
+          <span class="val">00F101 08</span>              <span class="cmt">// 仅已确认, 已消失</span>
+          <span class="val">00F102 20</span>              <span class="cmt">// 待确认, 活跃中</span>
+          <span class="val">00F103 08</span>              <span class="cmt">// 仅已确认, 已消失</span>
+
+<span class="cmt">// 只查 Pending 的 DTC</span>
+<span class="req">请求:</span> 19 02 20
+<span class="res">响应:</span> 59 02 00 00
+          <span class="val">00F102 20</span>              <span class="cmt">// 只有这一个是 pending</span>
+
+<span class="cmt">// 查全部（不用掩码）</span>
+<span class="req">请求:</span> 19 06
+<span class="res">响应:</span> 59 06 00 00
+          <span class="val">00F100 49</span>
+          <span class="val">00F101 08</span>
+          <span class="val">00F102 20</span>
+          <span class="val">00F103 08</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>5. 读数据 — SID <code>0x22</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x22</span><span class="svc-name">Read Data By Identifier</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>通过 DID（数据标识符）读取 BMS 各类数据。所有会话均可使用。</p>
+
+<h3>支持的 DID</h3>
+<table>
+  <tr><th>DID</th><th>数据</th><th>字节数</th><th>示例值</th></tr>
+  <tr><td><code>F1 90</code></td><td>VIN 码</td><td>17</td><td><code>FCX2026BMS7890123</code></td></tr>
+  <tr><td><code>F1 89</code></td><td>软件版本号</td><td>变长</td><td><code>V2.1.0_RC2</code></td></tr>
+  <tr><td><code>F1 00</code></td><td>总电压 (mV)</td><td>2</td><td><code>12600</code> mV</td></tr>
+  <tr><td><code>F1 01</code></td><td>电流 (mA, 有符号)</td><td>2</td><td><code>-2300</code> mA</td></tr>
+  <tr><td><code>F1 02</code></td><td>SOC (%)</td><td>1</td><td><code>78</code>%</td></tr>
+  <tr><td><code>F1 03</code></td><td>SOH (%)</td><td>1</td><td><code>95</code>%</td></tr>
+  <tr><td><code>F1 04</code></td><td>单体最高电压 (mV)</td><td>2</td><td><code>3650</code> mV</td></tr>
+  <tr><td><code>F1 05</code></td><td>单体最低电压 (mV)</td><td>2</td><td><code>3580</code> mV</td></tr>
+  <tr><td><code>F1 06</code></td><td>最高温度 (°C, 有符号)</td><td>1</td><td><code>35</code>°C</td></tr>
+  <tr><td><code>F1 07</code></td><td>最低温度 (°C, 有符号)</td><td>1</td><td><code>28</code>°C</td></tr>
+  <tr><td><code>F1 08</code></td><td>充放电状态</td><td>1</td><td><code>1</code>=充电 <code>2</code>=放电 <code>0</code>=空闲</td></tr>
+  <tr><td><code>F1 09</code></td><td>电芯数量</td><td>1</td><td><code>4</code> 串</td></tr>
+  <tr><td><code>F1 10</code></td><td>CAN 接收帧计数</td><td>4</td><td><code>0x00001234</code></td></tr>
+  <tr><td><code>F1 11</code></td><td>DTC 数量</td><td>1</td><td><code>4</code></td></tr>
+  <tr><td><code>F1 80</code></td><td>充电使能</td><td>1</td><td><code>1</code>=允许 <code>0</code>=禁止</td></tr>
+  <tr><td><code>F1 81</code></td><td>均衡使能</td><td>1</td><td><code>1</code>=允许 <code>0</code>=禁止</td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 读 SOC</span>
+<span class="req">请求:</span> 22 F1 02
+<span class="res">响应:</span> 62 F1 02 <span class="val">4E</span>             <span class="cmt">// SOC = 78%</span>
+
+<span class="cmt">// 读总电压</span>
+<span class="req">请求:</span> 22 F1 00
+<span class="res">响应:</span> 62 F1 00 <span class="val">31 38</span>          <span class="cmt">// 总电压 = 0x3138 = 12600 mV = 12.60V</span>
+
+<span class="cmt">// 读 VIN</span>
+<span class="req">请求:</span> 22 F1 90
+<span class="res">响应:</span> 62 F1 90 <span class="val">46 43 58 32 30 32 36 42 4D 53 37 38 39 30 31 32 33</span>
+                                            <span class="cmt">// "FCX2026BMS7890123"</span>
+
+<span class="cmt">// 读电流（负数 = 放电）</span>
+<span class="req">请求:</span> 22 F1 01
+<span class="res">响应:</span> 62 F1 01 <span class="val">F7 04</span>          <span class="cmt">// 0xF704 = -2300 mA = -2.3A (放电)</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>6. 安全访问 — SID <code>0x27</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x27</span><span class="svc-name">Security Access</span><span class="svc-dir"><span class="badge badge-warn">需扩展会话</span></span></div>
+<div class="svc-body">
+<p>挑战-应答安全认证。解锁后才能执行 0x2E 写数据和 0x31 例程控制。</p>
+
+<h3>子功能</h3>
+<table class="sf-table">
+  <tr><th>SF</th><th>步骤</th></tr>
+  <tr><td><code>0x01</code></td><td>请求种子 (Request Seed)</td></tr>
+  <tr><td><code>0x02</code></td><td>发送密钥 (Send Key)</td></tr>
+</table>
+<p><b>锁定机制</b>：连续 3 次密钥错误后锁定 10 秒，期间返回 NRC 0x37。</p>
+
+<h3>密钥算法</h3>
+<pre>Key = ((~Seed ^ 0x5A5A5A5A) + 0x3618BC91) & 0xFFFFFFFF</pre>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 步骤 1: 请求种子</span>
+<span class="req">请求:</span> 27 01
+<span class="res">响应:</span> 67 01 <span class="val">A5 C3 E1 F7</span>    <span class="cmt">// Seed = 0xA5C3E1F7</span>
+
+<span class="cmt">// 步骤 2: 计算并发送密钥</span>
+<span class="cmt">// Key = ((~0xA5C3E1F7 ^ 0x5A5A5A5A) + 0x3618BC91)</span>
+<span class="cmt">//     = ((0x5A3C1E08 ^ 0x5A5A5A5A) + 0x3618BC91)</span>
+<span class="cmt">//     = (0x00024452 + 0x3618BC91)</span>
+<span class="cmt">//     = 0x361B00E3</span>
+<span class="req">请求:</span> 27 02 <span class="val">36 1B 00 E3</span>
+<span class="res">响应:</span> 67 02                 <span class="cmt">// 解锁成功！现在可以写数据了</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>7. 通信控制 — SID <code>0x28</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x28</span><span class="svc-name">Communication Control</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>控制 ECU 通信状态，可让 ECU 进入静默模式停止响应。</p>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 开启静默模式 (不响应)</span>
+<span class="req">请求:</span> 28 00 03
+<span class="res">响应:</span> 68 00 03
+
+<span class="cmt">// 恢复正常通信</span>
+<span class="req">请求:</span> 28 00 00
+<span class="res">响应:</span> 68 00 00
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>8. 写数据 — SID <code>0x2E</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x2E</span><span class="svc-name">Write Data By Identifier</span><span class="svc-dir"><span class="badge badge-warn">需 0x27 解锁</span></span></div>
+<div class="svc-body">
+<p>通过 DID 修改 BMS 配置参数。<span class="badge badge-warn">必须先通过 0x27 安全访问解锁</span>。</p>
+
+<h3>可写的 DID</h3>
+<table>
+  <tr><th>DID</th><th>数据</th><th>格式</th></tr>
+  <tr><td><code>F1 90</code></td><td>VIN 码</td><td>17 字节 ASCII</td></tr>
+  <tr><td><code>F1 89</code></td><td>软件版本号</td><td>变长 ASCII</td></tr>
+  <tr><td><code>F1 02</code></td><td>SOC</td><td>1 字节 (0-100)</td></tr>
+  <tr><td><code>F1 08</code></td><td>充放电状态</td><td>1 字节</td></tr>
+  <tr><td><code>F1 01</code></td><td>电流</td><td>2 字节有符号 (mA)</td></tr>
+  <tr><td><code>F1 80</code></td><td>充电使能</td><td>1 字节 (1/0)</td></tr>
+  <tr><td><code>F1 81</code></td><td>均衡使能</td><td>1 字节 (1/0)</td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 修改 SOC 为 100%</span>
+<span class="req">请求:</span> 2E F1 02 <span class="val">64</span>
+<span class="res">响应:</span> 6E F1 02
+
+<span class="cmt">// 修改 VIN</span>
+<span class="req">请求:</span> 2E F1 90 <span class="val">4E 45 57 56 49 4E 30 30 30 30 30 30 30 30 30 30 30</span>
+<span class="res">响应:</span> 6E F1 90              <span class="cmt">// VIN = "NEWVIN00000000000"</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>9. 例程控制 — SID <code>0x31</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x31</span><span class="svc-name">Routine Control</span><span class="svc-dir"><span class="badge badge-warn">需 0x27 解锁</span></span></div>
+<div class="svc-body">
+<p>执行预定义的诊断例行程序。<span class="badge badge-warn">必须先通过 0x27 安全访问解锁</span>。</p>
+<p>仅支持 SF=0x01（启动例程），不支持 0x02（停止）和 0x03（查询结果）。</p>
+
+<h3>支持的例程 ID (RID)</h3>
+<table>
+  <tr><th>RID</th><th>例程</th><th>响应</th></tr>
+  <tr><td><code>E0 01</code></td><td>BMS 自检</td><td><code>71 E0 01 01</code> (status=pass)</td></tr>
+  <tr><td><code>E0 02</code></td><td>复位 SOC 到 100%</td><td><code>71 E0 02 01</code></td></tr>
+  <tr><td><code>E0 03</code></td><td>复位 SOH 到 100%</td><td><code>71 E0 03 01</code></td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 执行 BMS 自检</span>
+<span class="req">请求:</span> 31 01 E0 01
+<span class="res">响应:</span> 71 E0 01 <span class="val">01</span>           <span class="cmt">// 自检通过</span>
+
+<span class="cmt">// 复位 SOC 到 100%</span>
+<span class="req">请求:</span> 31 01 E0 02
+<span class="res">响应:</span> 71 E0 02 <span class="val">01</span>           <span class="cmt">// SOC 已设为 100</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>10. 测试仪在线 — SID <code>0x3E</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x3E</span><span class="svc-name">Tester Present</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>心跳信号，防止 ECU 自动退出当前会话。不需要响应时设 bit7=1。</p>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 需要响应</span>
+<span class="req">请求:</span> 3E 00
+<span class="res">响应:</span> 7E
+
+<span class="cmt">// 不需要响应 (抑制正响应)</span>
+<span class="req">请求:</span> 3E 80
+<span class="cmt">// 无响应</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>11. DTC 设置控制 — SID <code>0x85</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x85</span><span class="svc-name">Control DTC Setting</span><span class="svc-dir"><span class="badge badge-ok">CAN+DoIP</span></span></div>
+<div class="svc-body">
+<p>开关 DTC 记录功能。关闭后 0x19 读 DTC 会返回 NRC 0x22。</p>
+
+<h3>子功能</h3>
+<table class="sf-table">
+  <tr><th>SF</th><th>功能</th></tr>
+  <tr><td><code>0x01</code></td><td>启用 DTC 记录 (On)</td></tr>
+  <tr><td><code>0x02</code></td><td>禁用 DTC 记录 (Off)</td></tr>
+</table>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 禁用 DTC</span>
+<span class="req">请求:</span> 85 02
+<span class="res">响应:</span> C5 02
+
+<span class="cmt">// 此时读 DTC 会失败</span>
+<span class="req">请求:</span> 19 01 FF
+<span class="res">响应:</span> 7F 19 <span class="val">22</span>              <span class="cmt">// NRC 0x22 = Conditions Not Correct</span>
+
+<span class="cmt">// 重新启用</span>
+<span class="req">请求:</span> 85 01
+<span class="res">响应:</span> C5 01
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>12. 固件刷写 — SID <code>0x34</code> / <code>0x36</code> / <code>0x37</code></h2>
+
+<div class="svc">
+<div class="svc-header"><span class="svc-sid">0x34/36/37</span><span class="svc-name">Request Download / Transfer Data / Exit Transfer</span><span class="svc-dir"><span class="badge badge-info">仅 Bootloader (CAN)</span></span></div>
+<div class="svc-body">
+<p>固件刷写三件套。<span class="badge badge-warn">仅支持 CAN 通道</span>，APP 收到会返回 NRC 0x22。<br>
+需先通过 0x10 02 编程会话 + 安全解锁 + 0x31 FF00 擦除 Flash。</p>
+
+<h3>报文示例</h3>
+<pre>
+<span class="cmt">// 0x34: 请求下载</span>
+<span class="cmt">// 格式: 34 [DataFmtID] [AddrSizeFmt] [Addr 4B BigEndian] [Size 4B BigEndian]</span>
+<span class="req">请求:</span> 34 00 44 <span class="val">08 01 00 00</span> <span class="val">00 0F 00 00</span>
+<span class="cmt">       SID DF=00(无加密) AL=44(4+4)    Addr=0x08010000   Size=0x000F0000(960KB)</span>
+<span class="res">响应:</span> 74 40 <span class="val">80 00</span>             <span class="cmt">// MaxBlockSize=0x8000=32KB/块</span>
+
+<span class="cmt">// 前置条件: 编程会话(0x10 02) + 安全解锁(0x27) + Flash已擦除(0x31 FF00)</span>
+<span class="cmt">// 地址限制: Addr 必须 >= 0x08010000 (保护 Bootloader 区域)</span>
+
+<h3>完整刷写流程</h3>
+<pre>
+<span class="cmt">// 步骤 1: 编程会话 → 跳到 Bootloader (CAN 通信)</span>
+<span class="req">请求:</span> 10 02
+<span class="res">响应:</span> 50 02 00 32 13          <span class="cmt">// 随后 ECU 复位进入 Bootloader</span>
+
+<span class="cmt">// 步骤 2: 安全访问 (Seed/Key)</span>
+<span class="req">请求:</span> 27 01
+<span class="res">响应:</span> 67 01 xx xx xx xx       <span class="cmt">// 获取 Seed</span>
+<span class="req">请求:</span> 27 02 xx xx xx xx       <span class="cmt">// 发送 Key</span>
+<span class="res">响应:</span> 67 02
+
+<span class="cmt">// 步骤 3: 擦除 APP 区域</span>
+<span class="req">请求:</span> 31 01 FF 00
+<span class="res">响应:</span> 71 FF 00 <span class="val">01</span>             <span class="cmt">// 擦除成功 (擦除后签名变 0xFFFFFFFF)</span>
+
+<span class="cmt">// 步骤 4: 请求下载</span>
+<span class="req">请求:</span> 34 00 44 <span class="val">08 01 00 00</span> <span class="val">00 0F 00 00</span>
+<span class="res">响应:</span> 74 40 <span class="val">80 00</span>             <span class="cmt">// MaxBlockSize=32KB</span>
+
+<span class="cmt">// 步骤 5: 分块传输</span>
+<span class="cmt">// 每块 BlockSeq 递增，固件数据 32KB/块</span>
+<span class="req">请求:</span> 36 <span class="val">01</span> [32KB]  → <span class="res">76 01</span>
+<span class="req">请求:</span> 36 <span class="val">02</span> [32KB]  → <span class="res">76 02</span>
+<span class="cmt">// ... 重复直到全部发完 ...</span>
+
+<span class="cmt">// 步骤 6: 退出传输 + CRC32 校验</span>
+<span class="req">请求:</span> 37 <span class="val">[CRC32 4B]</span>
+<span class="res">响应:</span> 77                      <span class="cmt">// CRC 通过, 写入签名 0xB00710AD</span>
+
+<span class="cmt">// 步骤 7: ECU 复位</span>
+<span class="req">请求:</span> 11 01
+<span class="res">响应:</span> 51 01                      <span class="cmt">// ECU 复位, 启动新 APP</span>
+</pre>
+
+<span class="cmt">// 0x36: 传输数据</span>
+<span class="cmt">// 格式: 36 [BlockSeq 1B] [Data N Bytes]</span>
+<span class="cmt">// BlockSeq 从 1 开始递增，必须连续，Bootloader 会校验序号</span>
+<span class="req">请求:</span> 36 <span class="val">01</span> <span class="val">[32KB 固件数据]</span>    <span class="cmt">// BlockSeq=01</span>
+<span class="res">响应:</span> 76 <span class="val">01</span>                   <span class="cmt">// 确认收到块01</span>
+
+<span class="req">请求:</span> 36 <span class="val">02</span> <span class="val">[32KB 固件数据]</span>    <span class="cmt">// BlockSeq=02</span>
+<span class="res">响应:</span> 76 <span class="val">02</span>
+
+<span class="cmt">// ... 重复直到全部数据发完 ...
+
+// 0x37: 退出传输 (带 CRC32 校验)</span>
+<span class="cmt">// 格式: 37 [CRC32 4B BigEndian] (CRC32 可选，>=5字节时校验)</span>
+<span class="req">请求:</span> 37 <span class="val">A1 B2 C3 D4</span>          <span class="cmt">// 可选 CRC32 校验值</span>
+<span class="res">响应:</span> 77                   <span class="cmt">// CRC32 校验通过, 写入签名 0xB00710AD @0x080FFFF8</span>
+</pre>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<h2>CAN 帧格式 (ISO-TP)</h2>
+
+<table>
+  <tr><th>帧类型</th><th>PCI Byte</th><th>含义</th><th>数据长度</th></tr>
+  <tr><td>单帧 (SF)</td><td><code>0x0N</code></td><td>N = 数据长度 (0-7)</td><td>1 帧 ≤ 7 字节</td></tr>
+  <tr><td>首帧 (FF)</td><td><code>0x1N NN</code></td><td>NNN = 数据总长度 (8-4095)</td><td>第1帧含 6 字节数据</td></tr>
+  <tr><td>连续帧 (CF)</td><td><code>0x2S</code></td><td>S = 序号 1..15, 循环</td><td>每帧含 7 字节数据</td></tr>
+  <tr><td>流控帧 (FC)</td><td><code>0x3 0 BS ST</code></td><td>BS=连续帧数 ST=最小间隔</td><td>ECU 响应</td></tr>
+</table>
+
+<pre>
+<span class="cmt">// 单帧示例: 发送 "10 03" (2 字节)</span>
+CAN ID: 7E0  Data: <span class="req">02 10 03</span> 00 00 00 00 00  <span class="cmt">// PCI=0x02 表示长度2</span>
+
+<span class="cmt">// 多帧示例: 发送 17 字节 VIN (首帧 + 2 连续帧)</span>
+CAN ID: 7E0  Data: <span class="req">10 11</span> 22 F1 90 FC X2 0  <span class="cmt">// FF: PCI=0x10, 总长=0x011=17B</span>
+CAN ID: 7E8  Data: <span class="res">30 00 00</span> 00 00 00 00 00  <span class="cmt">// FC: BS=0(不限), ST=0(最快)</span>
+CAN ID: 7E0  Data: <span class="req">21</span> 26 B M S 7 8 9 0     <span class="cmt">// CF: PCI=0x21 序号1</span>
+CAN ID: 7E0  Data: <span class="req">22</span> 1 2 3 00 00 00 00      <span class="cmt">// CF: PCI=0x22 序号2</span>
+</pre>
+
+<h2>DoIP 帧格式</h2>
+
+<pre>
+<span class="cmt">// 所有 DoIP 消息前 8 字节为通用头:</span>
+ Byte 0:    Version (0x02)
+ Byte 1:    Version Inverse (~0x02 = 0xFD)
+ Byte 2-3:  Payload Type (大端)
+ Byte 4-7:  Payload Length (大端)
+
+<span class="cmt">// 诊断消息 (0x8001) 的 Payload 格式:</span>
+ Byte 0-1:  Source Address (测试仪: 0x0E00)
+ Byte 2-3:  Target Address (ECU: 0x0E80)
+ Byte 4+:   UDS 数据
+
+<span class="cmt">// 发送 "22 F1 02" (读 SOC) 的完整 DoIP 帧:</span>
+TCP: 02 FD <span class="req">80 01</span> 00 00 00 07  <span class="cmt">// Header: version=02 inv=FD type=0x8001 len=7</span>
+               <span class="val">0E 00 0E 80</span>        <span class="cmt">// SA=0x0E00 TA=0x0E80</span>
+               <span class="req">22 F1 02</span>           <span class="cmt">// UDS: Read DID 0xF102 (SOC)</span>
+
+<span class="cmt">// ECU 响应:</span>
+TCP: 02 FD <span class="res">80 01</span> 00 00 00 06  <span class="cmt">// Header: type=0x8001 len=6</span>
+               <span class="val">0E 80 0E 00</span>        <span class="cmt">// SA=0x0E80 TA=0x0E00 (互换!)</span>
+               <span class="res">62 F1 02</span> <span class="val">4E</span>     <span class="cmt">// UDS: 正响应 DID F102 = 0x4E (78%)</span>
+</pre>
+
+</body>
+</html>

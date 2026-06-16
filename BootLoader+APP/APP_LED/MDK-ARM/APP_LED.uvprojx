@@ -415,6 +415,11 @@
               <FilePath>..\Core\Src\uds.c</FilePath>
             </File>
             <File>
+              <FileName>nm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\nm.c</FilePath>
+            </File>
+            <File>
               <FileName>lcd.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Core\Inc\lcd.h</FilePath>
@@ -519,6 +524,11 @@
               <FileName>doip.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\DOIP\doip.c</FilePath>
+            </File>
+            <File>
+              <FileName>nm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\nm.c</FilePath>
             </File>
           </Files>
         </Group>

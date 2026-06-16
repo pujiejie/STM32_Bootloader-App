@@ -1,7 +1,7 @@
 app_led\uds.o: ..\Core\Src\uds.c
 app_led\uds.o: ../Core/Inc/uds.h
-app_led\uds.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
-app_led\uds.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\uds.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\uds.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
 app_led\uds.o: ../Core/Inc/main.h
 app_led\uds.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 app_led\uds.o: ../Core/Inc/stm32f4xx_hal_conf.h
@@ -37,4 +37,4 @@ app_led\uds.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 app_led\uds.o: ../Core/Inc/can.h
 app_led\uds.o: ../Core/Inc/isotp.h
 app_led\uds.o: ..\DOIP\doip.h
-app_led\uds.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\uds.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h

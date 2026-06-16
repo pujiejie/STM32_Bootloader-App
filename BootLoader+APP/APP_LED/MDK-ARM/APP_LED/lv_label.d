@@ -1,13 +1,13 @@
 app_led\lv_label.o: ..\lvgl\src\widgets\lv_label.c
 app_led\lv_label.o: ..\lvgl\src\widgets\lv_label.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../lv_conf_internal.h
-app_led\lv_label.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\lv_label.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../lv_conf_kconfig.h
 app_led\lv_label.o: ../lvgl/examples/porting/../../lv_conf.h
-app_led\lv_label.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdarg.h
+app_led\lv_label.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdarg.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/lv_obj.h
-app_led\lv_label.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
-app_led\lv_label.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdbool.h
+app_led\lv_label.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\lv_label.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdbool.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_style.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/../font/lv_font.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/../font/lv_symbol_def.h
@@ -17,7 +17,7 @@ app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_assert.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_log.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_types.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_mem.h
-app_led\lv_label.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\lv_label.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_math.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_anim.h
 app_led\lv_label.o: ..\lvgl\src\widgets\../core/../misc/lv_txt.h

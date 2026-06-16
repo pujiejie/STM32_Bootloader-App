@@ -1,6 +1,6 @@
 app_led\doip.o: ..\DOIP\doip.c
 app_led\doip.o: ..\DOIP\doip.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/tcp.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/opt.h
 app_led\doip.o: ../LWIP/Target/lwipopts.h
@@ -19,7 +19,7 @@ app_led\doip.o: ../Drivers/CMSIS/Include/mpu_armv7.h
 app_led\doip.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 app_led\doip.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 app_led\doip.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
 app_led\doip.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 app_led\doip.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 app_led\doip.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
@@ -41,11 +41,11 @@ app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/debug.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/arch.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/system/arch/cc.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/system/arch/cpu.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdlib.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdio.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\inttypes.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\limits.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\ctype.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdlib.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdio.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\inttypes.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\limits.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\ctype.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/opt.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/tcpbase.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/mem.h
@@ -73,4 +73,4 @@ app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/prot/icmp.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/udp.h
 app_led\doip.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/prot/udp.h
 app_led\doip.o: ../Core/Inc/uds.h
-app_led\doip.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\doip.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h

@@ -2,6 +2,7 @@
 "app_led\startup_stm32f407xx.o"
 "app_led\isotp.o"
 "app_led\uds.o"
+"app_led\nm.o"
 "app_led\lcd.o"
 "app_led\main.o"
 "app_led\gpio.o"

@@ -1,11 +1,11 @@
 app_led\lv_img_buf.o: ..\lvgl\src\draw\lv_img_buf.c
-app_led\lv_img_buf.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
-app_led\lv_img_buf.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\lv_img_buf.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\lv_img_buf.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\lv_img_buf.h
-app_led\lv_img_buf.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdbool.h
+app_led\lv_img_buf.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdbool.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_color.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/../lv_conf_internal.h
-app_led\lv_img_buf.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\lv_img_buf.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/../lv_conf_kconfig.h
 app_led\lv_img_buf.o: ../lvgl/examples/porting/../../lv_conf.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_assert.h
@@ -22,7 +22,7 @@ app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/../font/lv_font.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/../font/lv_symbol_def.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_anim.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_txt.h
-app_led\lv_img_buf.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdarg.h
+app_led\lv_img_buf.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdarg.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_printf.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_bidi.h
 app_led\lv_img_buf.o: ..\lvgl\src\draw\../misc/lv_style_gen.h

@@ -21,6 +21,7 @@
 #include "can.h"
 
 /* USER CODE BEGIN 0 */
+#include "nm.h"
 CAN_RxHeaderTypeDef UDS_RxHeader; 
 uint8_t             UDS_RxData[8];
 volatile uint8_t    uds_rx_flag = 0;
@@ -137,7 +138,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 }
 
 /* USER CODE BEGIN 1 */
-// 这个函数是 HAL 库预留的“弱函数”，一旦 CAN 有新消息，HAL 库会自动呼叫它
+// 这个函数是 HAL 库预留的"弱函数"，一旦 CAN 有新消息，HAL 库会自动呼叫它
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     // 检查是哪个 CAN 外设触发的
@@ -148,13 +149,22 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
             __HAL_CAN_CLEAR_FLAG(hcan, CAN_FLAG_FOV0);
         }
 
-        // 2. 从硬件 FIFO 里把数据“捞”出来，存到我们的全避变量里
-        if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &UDS_RxHeader, UDS_RxData) == HAL_OK)
+        // 2. 从硬件 FIFO 里把数据"捞"出来，存到我们的全局变量里
+        CAN_RxHeaderTypeDef rx_header;
+        uint8_t rx_data[8];
+        if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data) == HAL_OK)
         {
             // 3. 接收物理寻址 (0x7E0) 和功能寻址 (0x7DF)
-            if (UDS_RxHeader.StdId == 0x7E0 || UDS_RxHeader.StdId == 0x7DF)
+            if (rx_header.StdId == 0x7E0 || rx_header.StdId == 0x7DF)
             {
+                UDS_RxHeader = rx_header;
+                for (uint8_t i = 0; i < 8; i++) UDS_RxData[i] = rx_data[i];
                 uds_rx_flag = 1; 
+            }
+            // 4. NM 帧 (0x500 ~ 0x5FF) → 交给网络管理模块
+            else if (rx_header.StdId >= 0x500 && rx_header.StdId < 0x600)
+            {
+                NM_ReceiveHandler(rx_header.StdId, rx_data);
             }
         }
     }

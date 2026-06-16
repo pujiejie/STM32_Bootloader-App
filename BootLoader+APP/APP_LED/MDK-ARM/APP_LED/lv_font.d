@@ -1,11 +1,11 @@
 app_led\lv_font.o: ..\lvgl\src\font\lv_font.c
 app_led\lv_font.o: ..\lvgl\src\font\lv_font.h
 app_led\lv_font.o: ..\lvgl\src\font\../lv_conf_internal.h
-app_led\lv_font.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\lv_font.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\lv_font.o: ..\lvgl\src\font\../lv_conf_kconfig.h
 app_led\lv_font.o: ../lvgl/examples/porting/../../lv_conf.h
-app_led\lv_font.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
-app_led\lv_font.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdbool.h
+app_led\lv_font.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\lv_font.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdbool.h
 app_led\lv_font.o: ..\lvgl\src\font\lv_symbol_def.h
 app_led\lv_font.o: ..\lvgl\src\font\../misc/lv_area.h
 app_led\lv_font.o: ..\lvgl\src\font\../misc/lv_utils.h
@@ -13,4 +13,4 @@ app_led\lv_font.o: ..\lvgl\src\font\../misc/lv_log.h
 app_led\lv_font.o: ..\lvgl\src\font\../misc/lv_types.h
 app_led\lv_font.o: ..\lvgl\src\font\../misc/lv_assert.h
 app_led\lv_font.o: ..\lvgl\src\font\../misc/lv_mem.h
-app_led\lv_font.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\lv_font.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h

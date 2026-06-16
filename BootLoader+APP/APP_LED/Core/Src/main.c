@@ -22,6 +22,7 @@
 #include "lvgl.h"
 #include "lv_port_disp.h"
 #include "doip.h"
+#include "nm.h"
 #include <stdio.h>
 #include <string.h>
 /* USER CODE END Includes */
@@ -396,6 +397,9 @@ int main(void)
   /* DOIP TCP/UDP server */
   DOIP_Init();
 
+  /* CAN 网络管理 */
+  NM_Init();
+
   /* ─── YT8512C MAC 补丁: 手动纠正速度和双工 ─── */
   {
       extern ETH_HandleTypeDef heth;
@@ -474,6 +478,9 @@ int main(void)
 
     // ─── DOIP TCP 回调(在 ethernetif_input 中已处理, 这里做超时等) ───
     DOIP_Process();
+
+    // ─── 网络管理: 周期性发送 NM PDU + 离线检测 ───
+    NM_Process();
 
     // ─── 诊断: 每2秒打印网络状态 ───
     extern volatile uint8_t  g_eth_link_up;

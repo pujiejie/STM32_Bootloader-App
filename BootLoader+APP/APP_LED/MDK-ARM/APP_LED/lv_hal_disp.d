@@ -1,9 +1,9 @@
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\lv_hal_disp.c
-app_led\lv_hal_disp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
-app_led\lv_hal_disp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\lv_hal_disp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\lv_hal_disp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\lv_hal.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\lv_hal_disp.h
-app_led\lv_hal_disp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdbool.h
+app_led\lv_hal_disp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdbool.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\lv_hal.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/lv_draw.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../lv_conf_internal.h
@@ -18,11 +18,11 @@ app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_assert.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_log.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_types.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_mem.h
-app_led\lv_hal_disp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\lv_hal_disp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_math.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_anim.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_txt.h
-app_led\lv_hal_disp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdarg.h
+app_led\lv_hal_disp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdarg.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_printf.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_bidi.h
 app_led\lv_hal_disp.o: ..\lvgl\src\hal\../draw/../misc/lv_style_gen.h

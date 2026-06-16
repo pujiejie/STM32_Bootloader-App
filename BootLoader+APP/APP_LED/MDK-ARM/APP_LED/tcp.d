@@ -9,7 +9,7 @@ app_led\tcp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 app_led\tcp.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 app_led\tcp.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 app_led\tcp.o: ../Drivers/CMSIS/Include/core_cm4.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\tcp.o: ../Drivers/CMSIS/Include/cmsis_version.h
 app_led\tcp.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 app_led\tcp.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -17,7 +17,7 @@ app_led\tcp.o: ../Drivers/CMSIS/Include/mpu_armv7.h
 app_led\tcp.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 app_led\tcp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 app_led\tcp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
 app_led\tcp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 app_led\tcp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 app_led\tcp.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
@@ -39,11 +39,11 @@ app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/debug.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/arch.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/system/arch/cc.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/system/arch/cpu.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdlib.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdio.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\inttypes.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\limits.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\ctype.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdlib.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdio.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\inttypes.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\limits.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\ctype.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/opt.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/def.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/mem.h
@@ -72,4 +72,4 @@ app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/prot/icmp.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/priv/tcp_priv.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/prot/tcp.h
 app_led\tcp.o: ../Middlewares/Third_Party/LwIP/src/include/lwip/nd6.h
-app_led\tcp.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\tcp.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h

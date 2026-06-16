@@ -1,13 +1,13 @@
 app_led\lv_async.o: ..\lvgl\src\misc\lv_async.c
 app_led\lv_async.o: ..\lvgl\src\misc\lv_async.h
 app_led\lv_async.o: ..\lvgl\src\misc\lv_types.h
-app_led\lv_async.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdint.h
+app_led\lv_async.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdint.h
 app_led\lv_async.o: ..\lvgl\src\misc\lv_mem.h
 app_led\lv_async.o: ..\lvgl\src\misc\../lv_conf_internal.h
 app_led\lv_async.o: ..\lvgl\src\misc\../lv_conf_kconfig.h
 app_led\lv_async.o: ../lvgl/examples/porting/../../lv_conf.h
-app_led\lv_async.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stddef.h
-app_led\lv_async.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\string.h
+app_led\lv_async.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stddef.h
+app_led\lv_async.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\string.h
 app_led\lv_async.o: ..\lvgl\src\misc\lv_timer.h
 app_led\lv_async.o: ..\lvgl\src\misc\../hal/lv_hal_tick.h
-app_led\lv_async.o: C:\Keil_v5\ARM\arm5_compiler\Bin\..\include\stdbool.h
+app_led\lv_async.o: C:\MDK\ARM\arm5_compiler\Bin\..\include\stdbool.h
